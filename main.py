@@ -22,29 +22,28 @@ async def on_ready():
 # ======================
 @bot.command()
 async def go(ctx):
-    author = ctx.author.name
-
-    if author not in Pokemon.pokemons:
-        chance = random.randint(1, 3)
-
+    author = ctx.author.name  # Getting the name of the message's author
+    # Check whether the user already has a Pokémon. If not, then...
+    if author not in Pokemon.pokemons.keys():
+        # pokemon = Pokemon(author)  # Creating a new Pokémon
+        chance = random.randint(1, 3)  # Menghasilkan angka acak dari 1 hingga 3
+        # Buat objek Pokémon tergantung pada nomor acak
         if chance == 1:
-            pokemon = Pokemon(author)
+            pokemon = Pokemon(author)  # Membuat Pokémon standar
         elif chance == 2:
-            pokemon = Wizard(author)
+            pokemon = Wizard(author)  # Membuat Pokémon Wizard 
         elif chance == 3:
             pokemon = Fighter(author)
-
-        await ctx.send(await pokemon.info())
-
-        image_url = await pokemon.show_img()
+        await ctx.send(await pokemon.info())  # Sending information about the Pokémon
+        image_url = await pokemon.show_img()  # Getting the URL of the Pokémon image
         if image_url:
-            embed = discord.Embed(title="Your Pokémon")
-            embed.set_image(url=image_url)
-            await ctx.send(embed=embed)
+            embed = discord.Embed()  # Creating an embed message
+            embed.set_image(url=image_url)  # Setting up the Pokémon's image
+            await ctx.send(embed=embed)  # Sending an embedded message with an image
         else:
-            await ctx.send("Failed to upload Pokémon image.")
+            await ctx.send("Failed to upload an image of the pokémon.")
     else:
-        await ctx.send("You've already created your own Pokémon.")
+        await ctx.send("You've already created your own Pokémon.")  # A message that is printed whether a Pokémon has already been created
 
 # ======================
 # ATTACK
@@ -83,6 +82,19 @@ async def info(ctx):
             await ctx.send(embed=embed)
     else:
         await ctx.send("❌ Kamu belum punya Pokémon. Gunakan `!go`.")
+
+# ======================
+# FEED
+# ======================
+@bot.command()
+async def feed(ctx):
+    author = ctx.author.name
+    if author in Pokemon.pokemons:
+        pokemon = Pokemon.pokemons[author]
+        response = await pokemon.feed()
+        await ctx.send(response)
+    else:
+        await ctx.send("Anda tidak memiliki Pokémon!")
 
 # ======================
 # START
